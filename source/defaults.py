@@ -1,0 +1,44 @@
+import os
+import json
+
+DEFAULTS_FILE_PATH = "defaults.json"
+DEFAULT_DATA = dict(
+    main=dict(
+        auth_code="",
+        mode="",
+        port="8080",
+        server="https://backseatgamer.pythonanywhere.com",
+        frequency="2",
+        format="json"
+    )
+)
+
+WINDOW_SETTINGS = {
+    "title": "BackSeatGamer Reverse Proxy",
+    "finalize": True,
+    "icon": "assets/logo.ico" if os.name == 'nt' else "assets/logo.png"
+}
+
+
+def init():
+    if not os.path.isfile(DEFAULTS_FILE_PATH):
+        with open(DEFAULTS_FILE_PATH, 'w') as f:
+            f.write(json.dumps(DEFAULT_DATA))
+
+
+def get_defaults(menu: str = "main") -> dict:
+    with open(DEFAULTS_FILE_PATH) as f:
+        return json.loads(f.read())[menu]
+
+
+def set_defaults(menu: str, defaults: dict):
+    with open(DEFAULTS_FILE_PATH) as f:
+        data = json.loads(f.read())
+
+    data[menu] = defaults
+
+    with open(DEFAULTS_FILE_PATH, 'w') as f:
+        f.write(json.dumps(data))
+
+
+init()
