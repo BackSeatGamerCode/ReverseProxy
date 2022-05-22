@@ -9,7 +9,7 @@ DEFAULT_DATA = dict(
         port="8080",
         server="https://backseatgamer.pythonanywhere.com",
         frequency="2",
-        format="json"
+        format="JSON"
     )
 )
 
