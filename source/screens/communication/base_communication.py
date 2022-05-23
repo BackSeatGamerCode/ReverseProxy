@@ -100,7 +100,7 @@ class BaseCommunication(abc.ABC):
         self._show_error = True
         try:
             self._window["Stop"].click()
-        except AttributeError:
+        except (AttributeError, TypeError):
             raise exceptions.FailedToConnectException()
 
     def _dispatch_reward(self, command: str, name: str, guest: str):
@@ -174,7 +174,8 @@ class BaseCommunication(abc.ABC):
 
         del settings["finalize"]
 
-        {
+        return {
             "popup": sg.Popup,
-            "error": sg.PopupError
+            "error": sg.PopupError,
+            "popup_ok_cancel": sg.PopupOKCancel
         }[dialog_type.lower()](message, **settings)

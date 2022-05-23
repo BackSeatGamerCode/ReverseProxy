@@ -37,9 +37,13 @@ class TCPBroadcast(base_communication.BaseCommunication):
                 break
 
             except ConnectionRefusedError:
-                self.alert_box(
+                result = self.alert_box(
                     "Failed to connect to TCP/IP Server at {}:{}.\n"
-                    "Ensure the game is running, and press 'OK' to retry".format(
+                    "Ensure the game is running, and press 'OK' to retry, or 'Cancel' to return to the menu".format(
                         self.host, self.port
-                    )
+                    ),
+                    dialog_type="popup_ok_cancel"
                 )
+
+                if result in (None, "Cancel"):
+                    self.return_to_menu()
