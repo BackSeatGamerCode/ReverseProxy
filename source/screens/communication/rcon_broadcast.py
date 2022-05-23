@@ -78,7 +78,7 @@ class RCONBroadcast(base_communication.BaseCommunication):
 
             except ConnectionRefusedError:
                 result = self.alert_box(
-                    "Failed to connect to TCP/IP Server at {}:{}.\n"
+                    "Failed to connect to RCON Server at {}:{}.\n"
                     "Ensure the game is running, and press 'OK' to retry, or 'Cancel' to return to the menu".format(
                         self.host, self.port
                     ),
