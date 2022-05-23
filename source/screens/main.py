@@ -13,6 +13,7 @@ MODES = {
     "Write To File": communication.FileWrite,
     "UDP Broadcast": communication.UDPBroadcast,
     "HTTP Listen": communication.HTTPListen,
+    "HTTP Broadcast": communication.HTTPBroadcast,
 }
 FORMATS = [
     "JSON",

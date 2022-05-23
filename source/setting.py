@@ -9,7 +9,7 @@ def default_cast(value: str):
 class Setting:
     def __init__(
             self, display: str, key: str, input_type: str = "text", default="", mandatory: bool = True,
-            is_valid: callable = default_valid, cast: callable = default_cast
+            is_valid: callable = default_valid, cast: callable = default_cast, **kwargs
     ):
         self.display = display
         self.key = key
@@ -18,3 +18,11 @@ class Setting:
         self.mandatory = mandatory
         self.is_valid = is_valid
         self.cast = cast
+        self.kwargs = kwargs
+
+        if "allowed_values" in self.kwargs:
+            self.is_valid = lambda x: x in self.allowed_values
+
+    @property
+    def allowed_values(self) -> list:
+        return self.kwargs["allowed_values"]

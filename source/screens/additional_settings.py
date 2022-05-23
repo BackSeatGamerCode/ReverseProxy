@@ -32,6 +32,15 @@ def show(name: str, settings: typing.List[setting.Setting]) -> dict:
                 sg.Checkbox(s.display, default=default_values.get(s.key, s.default), key="K_" + s.key)
             ]
 
+        elif s.input_type == "dropdown":
+            return [
+                sg.Text(s.display),
+                sg.Combo(
+                    s.allowed_values, readonly=True, default_value=default_values.get(s.key, s.default),
+                    key="K_" + s.key
+                )
+            ]
+
     def alert_box(message: str):
         props = defaults.WINDOW_SETTINGS.copy()
         del props["finalize"]
