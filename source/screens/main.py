@@ -17,7 +17,8 @@ MODES = {
 }
 FORMATS = [
     "JSON",
-    "XML"
+    "XML",
+    "CSV"
 ]
 
 

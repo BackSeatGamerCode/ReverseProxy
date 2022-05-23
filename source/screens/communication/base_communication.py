@@ -3,6 +3,8 @@ import json
 import sys
 import threading
 import time
+import csv
+import io
 
 import PySimpleGUI as sg
 
@@ -114,6 +116,18 @@ class BaseCommunication(abc.ABC):
 
         if data_format == "json":
             message = json.dumps(data)
+
+        elif data_format == "csv":
+            output = io.StringIO()
+
+            writer = csv.DictWriter(output, fieldnames=data.keys())
+            writer.writeheader()
+            writer.writerows([data])
+
+            output.seek(0)
+            message = output.read()
+            output.close()
+
         else:
             message = '<?xml version="1.0" encoding="UTF-8" ?>\n<reward {}/>'.format(
                 " ".join("{}=\"{}\"".format(k, v.replace('"', '\\"')) for k, v in data.items())

@@ -56,3 +56,9 @@ In all cases, `guest` is the display name of the guest who triggered the reward.
 <?xml version="1.0" encoding="UTF-8" ?>
 <reward command="freeParkEntry" name="Free Park Entry (1 min)" guest="SomeGuest"/>
 ```
+
+#### CSV (Comma Seperated Values)
+```csv
+command,name,guest
+freeParkEntry,Free Park Entry (1 min),SomeGuest
+```
