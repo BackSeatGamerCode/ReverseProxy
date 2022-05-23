@@ -39,3 +39,17 @@ The following is a list of availible modes and a description of each. More will 
 - **Write To File**: This mode requires the user to provide a path to a directory. Each time a new reward comes in, a new file will be created in that directory containing the reward details. The name of the file will be the UNIX timestamp with the file extension ".txt" regardless of the format. This mode should be used as a last resort, because if files are not removed fast enough or at all, this could clog up the end user's hard drive.
 
 ### Formats
+The following is a list of data formats which could be sent by the proxy. Every format contains the same information, but presented in a different way. Each request will only ever return a single reward, even if there are multiple queued in the proxy. This makes mod development more simple.
+
+In all cases, `guest` is the display name of the guest who triggered the reward. If a reward was triggered through the proxy, the name will be `ManualTrigger`.
+
+#### JSON (JavaScript Object Notation)
+```json
+{"command": "freeParkEntry", "name": "Free Park Entry (1 min)", "guest": "SomeGuest"}
+```
+
+#### XML (eXtensible Markup Language)
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<reward command="freeParkEntry" name="Free Park Entry (1 min)" guest="SomeGuest"/>
+```
