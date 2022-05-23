@@ -14,6 +14,7 @@ MODES = {
     "UDP Broadcast": communication.UDPBroadcast,
     "HTTP Listen": communication.HTTPListen,
     "HTTP Broadcast": communication.HTTPBroadcast,
+    "RCON Broadcast": communication.RCONBroadcast,
 }
 FORMATS = [
     "JSON",

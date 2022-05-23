@@ -22,12 +22,15 @@ class BaseCommunication(abc.ABC):
     def __init__(self, config: dict, start: bool = True):
         self._config = config
 
+        self.raw_message_data = False
+
         self._rewards = self._get_rewards()
         self._commands = {i["command"]: i["name"] for i in self._rewards}
         self._running = True
         self._show_error = False
 
-        self.additional_settings = {}
+        if not hasattr(self, "additional_settings"):
+            self.additional_settings = {}
 
         self._window = None
 
@@ -113,6 +116,10 @@ class BaseCommunication(abc.ABC):
             name=name,
             guest=guest
         )
+
+        if self.raw_message_data:
+            self.send_reward(data)
+            return
 
         if data_format == "json":
             message = json.dumps(data)
