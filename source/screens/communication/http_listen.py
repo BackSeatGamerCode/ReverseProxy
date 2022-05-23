@@ -17,7 +17,7 @@ class HTTPListen(base_communication.BaseCommunication):
     def startup(self):
         self.app = Flask(__name__, template_folder=None, static_folder=None)
 
-        @self.app.route("/")
+        @self.app.route("/", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
         def index():
             try:
                 return self.q.pop().decode("utf8")
