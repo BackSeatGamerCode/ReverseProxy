@@ -19,6 +19,9 @@ WINDOW_SETTINGS = {
     "icon": "assets/logo.ico" if os.name == 'nt' else "assets/logo.png"
 }
 
+RAW_WINDOW_SETTINGS = WINDOW_SETTINGS.copy()
+del RAW_WINDOW_SETTINGS["finalize"]
+
 
 def init():
     if not os.path.isfile(DEFAULTS_FILE_PATH):

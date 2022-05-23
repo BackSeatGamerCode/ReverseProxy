@@ -60,7 +60,7 @@ def show():
             }
 
             if any(i.strip() == "" for i in config.values()):
-                sg.Popup("All fields are mandatory!", **defaults.WINDOW_SETTINGS)
+                sg.Popup("All fields are mandatory!", **defaults.RAW_WINDOW_SETTINGS)
                 continue
 
             if not config["server"].endswith("/"):
@@ -69,13 +69,13 @@ def show():
             if config["port"].isdigit():
                 config["port"] = int(config["port"])
             else:
-                sg.Popup("Port must be an integer", **defaults.WINDOW_SETTINGS)
+                sg.Popup("Port must be an integer", **defaults.RAW_WINDOW_SETTINGS)
                 continue
 
             if config["frequency"].isdigit():
                 config["frequency"] = int(config["frequency"])
             else:
-                sg.Popup("Frequency must be an integer", **defaults.WINDOW_SETTINGS)
+                sg.Popup("Frequency must be an integer", **defaults.RAW_WINDOW_SETTINGS)
                 continue
 
             if config["frequency"] < 2:
