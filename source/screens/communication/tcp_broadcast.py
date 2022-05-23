@@ -13,7 +13,7 @@ class TCPBroadcast(base_communication.BaseCommunication):
 
     def send_reward(self, message: str):
         try:
-            self.socket.sendall(message.encode("utf8"))
+            self.socket.sendall(message.encode("utf8") + b"\n")
             self.socket.recv(1024)
         except ConnectionError:
 

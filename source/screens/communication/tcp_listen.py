@@ -40,12 +40,12 @@ class TCPListen(base_communication.BaseCommunication):
                 ).start()
                 self.write_to_console("Received TCP/IP Connection From {}:{}".format(*addr))
 
-                self.queues[addr] = queue.Queue()
-
             except OSError:
                 break
 
     def new_connection(self, sock, addr):
+        self.queues[addr] = queue.Queue()
+
         while self._running:
             try:
                 sock.recv(1024)
@@ -53,9 +53,9 @@ class TCPListen(base_communication.BaseCommunication):
                     sock.send(self.queues[addr].pop())
 
                 else:
-                    sock.send("null".encode("utf8"))
+                    sock.send("null\n".encode("utf8"))
 
-            except ConnectionAbortedError:
+            except ConnectionError:
                 self.write_to_console("Lost TCP/IP Connection From {}:{}".format(*addr))
                 del self.queues[addr]
 
