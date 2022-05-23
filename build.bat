@@ -6,6 +6,6 @@ pyinstaller BackSeatGamerReverseProxy.py --onefile --name "ReverseProxy" -i asse
 cp assets dist -r
 
 cd dist
-zip -r "ReverseProxy.zip" *
+zip -r "ReverseProxyWindows.zip" *
 
 PAUSE
