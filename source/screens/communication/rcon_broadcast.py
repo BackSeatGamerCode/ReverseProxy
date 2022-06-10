@@ -48,7 +48,7 @@ class RCONBroadcast(base_communication.BaseCommunication):
             if not command.startswith("/"):
                 command = "/" + command
 
-            self.send_command('/c game.print("{} redeemed the reward {}")'.format(
+            self.send_command('/silent-command game.print("{} redeemed the reward {}")'.format(
                 self.sanitize(message["guest"]), self.sanitize(message["name"])
             ))
 
