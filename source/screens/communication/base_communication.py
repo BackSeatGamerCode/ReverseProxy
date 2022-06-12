@@ -1,19 +1,21 @@
 import abc
+import csv
+import io
 import json
+import queue
 import sys
 import threading
 import time
-import csv
-import io
+import typing
 
 import PySimpleGUI as sg
+import pyttsx3
 
 import source.defaults as defaults
-import typing
-import source.setting as setting
 import source.exceptions as exceptions
 import source.screens.additional_settings as additional_settings_screen
 import source.sdk as sdk
+import source.setting as setting
 
 
 class BaseCommunication(abc.ABC):
@@ -28,6 +30,10 @@ class BaseCommunication(abc.ABC):
         self._commands = {i["command"]: i["name"] for i in self._rewards}
         self._running = True
         self._show_error = False
+
+        self._tts_queue = queue.Queue()
+        self._tts_thread = threading.Thread(target=self._tts_handler, name="TTSHandler", daemon=True)
+        self._tts_thread.start()
 
         if not hasattr(self, "additional_settings"):
             self.additional_settings = {}
@@ -47,13 +53,24 @@ class BaseCommunication(abc.ABC):
                 sg.Multiline(disabled=True, size=(None, 30), key="output", autoscroll=True),
                 sg.Frame("Manually Trigger A Reward", layout=self._reward_buttons)
             ],
-            [sg.Button("Clear"), sg.Button("Stop")]
+            [
+                sg.Button("Clear"), sg.Button("Stop"),
+                sg.Checkbox("Text to Speech", default=True, key="tts"), sg.Button("Clear TTS Queue")
+            ]
         ]
 
         self.startup()
 
         if start:
             self.show_window()
+
+    def _tts_handler(self):
+        engine = pyttsx3.init()
+
+        while True:
+            message = self._tts_queue.get()
+            engine.say(message)
+            engine.runAndWait()
 
     def get_additional_settings(self, name: str, settings: typing.List[setting.Setting]):
         self.additional_settings = additional_settings_screen.show(name, settings)
@@ -108,6 +125,9 @@ class BaseCommunication(abc.ABC):
 
     def _dispatch_reward(self, command: str, name: str, guest: str):
         self.write_to_console("{} ({}) from: {}".format(name, command, guest))
+
+        if self._window["tts"].get():
+            self._tts_queue.put("{} has redeemed {}".format(guest, name))
 
         data_format = self._config["format"].lower()
 
@@ -175,6 +195,10 @@ class BaseCommunication(abc.ABC):
 
                 self.teardown()
                 return
+
+            elif event == "Clear TTS Queue":
+                while not self._tts_queue.empty():
+                    self._tts_queue.get()
 
     def alert_box(self, message: str, dialog_type: str = "Popup"):
         settings = defaults.WINDOW_SETTINGS.copy()
