@@ -15,6 +15,7 @@ MODES = {
     "HTTP Listen": communication.HTTPListen,
     "HTTP Broadcast": communication.HTTPBroadcast,
     "RCON Broadcast": communication.RCONBroadcast,
+    "No Action": communication.NoAction,
 }
 FORMATS = [
     "JSON",
