@@ -9,13 +9,14 @@ import time
 import typing
 
 import PySimpleGUI as sg
-import pyttsx3
+import source.tts as tts
 
 import source.defaults as defaults
 import source.exceptions as exceptions
 import source.screens.additional_settings as additional_settings_screen
 import source.sdk as sdk
 import source.setting as setting
+import source.screens.tts_settings as tts_settings
 
 TOOLBAR_STRUCTURE = [
     ['Session', ['Clear', 'Stop']],
@@ -72,12 +73,10 @@ class BaseCommunication(abc.ABC):
             self.show_window()
 
     def _tts_handler(self):
-        engine = pyttsx3.init()
-
         while True:
             message = self._tts_queue.get()
-            engine.say(message)
-            engine.runAndWait()
+            tts.TTS_ENGINE.say(message)
+            tts.TTS_ENGINE.runAndWait()
 
     def get_additional_settings(self, name: str, settings: typing.List[setting.Setting]):
         self.additional_settings = additional_settings_screen.show(name, settings)
@@ -206,6 +205,9 @@ class BaseCommunication(abc.ABC):
             elif event == "Clear TTS Queue":
                 while not self._tts_queue.empty():
                     self._tts_queue.get()
+
+            elif event == "TTS Options":
+                tts_settings.show()
 
     def alert_box(self, message: str, dialog_type: str = "Popup"):
         settings = defaults.WINDOW_SETTINGS.copy()
