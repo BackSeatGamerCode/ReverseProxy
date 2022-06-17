@@ -17,6 +17,12 @@ import source.screens.additional_settings as additional_settings_screen
 import source.sdk as sdk
 import source.setting as setting
 
+TOOLBAR_STRUCTURE = [
+    ['Session', ['Clear', 'Stop']],
+    ["TTS", ["TTS Options", "Clear TTS Queue"]],
+    ['Help', 'About']
+]
+
 
 class BaseCommunication(abc.ABC):
     PORT = True
@@ -48,6 +54,7 @@ class BaseCommunication(abc.ABC):
         ])
 
         self._layout = [
+            [sg.Menu(TOOLBAR_STRUCTURE)],
             [sg.Text("BackSeatGamer Reverse Proxy")],
             [
                 sg.Multiline(disabled=True, size=(None, 30), key="output", autoscroll=True),

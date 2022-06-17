@@ -17,6 +17,7 @@ MODES = {
     "RCON Broadcast": communication.RCONBroadcast,
     "No Action": communication.NoAction,
 }
+
 FORMATS = [
     "JSON",
     "XML",
