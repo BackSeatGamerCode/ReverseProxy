@@ -17,6 +17,7 @@ import source.screens.additional_settings as additional_settings_screen
 import source.sdk as sdk
 import source.setting as setting
 import source.screens.tts_settings as tts_settings
+import source.constants as constants
 
 TOOLBAR_STRUCTURE = [
     ['Session', ['Clear', 'Stop']],
@@ -201,6 +202,9 @@ class BaseCommunication(abc.ABC):
 
                 self.teardown()
                 return
+
+            elif event == "About":
+                self.alert_box(constants.ABOUT_TEXT)
 
             elif event == "Clear TTS Queue":
                 while not self._tts_queue.empty():
