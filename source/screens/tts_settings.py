@@ -1,11 +1,7 @@
-import sys
-
 import PySimpleGUI as sg
 
 import source.defaults as defaults
 import source.tts as tts
-
-sg.change_look_and_feel('Dark2')
 
 VOICES = {voice.name: voice.id for voice in tts.TTS_ENGINE.getProperty('voices')}
 
@@ -50,6 +46,12 @@ def show():
             tts.TTS_ENGINE.setProperty('rate', values["rate"])
             tts.TTS_ENGINE.setProperty('volume', values["volume"] / 100)
             tts.TTS_ENGINE.setProperty('voice', VOICES[values["voice"]])
+
+            defaults.set_defaults("tts", {
+                'rate': values["rate"],
+                'volume': values["volume"] / 100,
+                'voice': VOICES[values["voice"]]
+            })
 
             break
 

@@ -74,6 +74,15 @@ class BaseCommunication(abc.ABC):
             self.show_window()
 
     def _tts_handler(self):
+        try:
+            default_values = defaults.get_defaults("tts")
+        except KeyError:
+            default_values = {}
+
+        tts.TTS_ENGINE.setProperty('rate', default_values.get('rate', tts.TTS_ENGINE.getProperty('rate')))
+        tts.TTS_ENGINE.setProperty('volume', default_values.get('volume', tts.TTS_ENGINE.getProperty('volume')))
+        tts.TTS_ENGINE.setProperty('voice', default_values.get('voice', tts.TTS_ENGINE.getProperty('voice')))
+
         while True:
             message = self._tts_queue.get()
             tts.TTS_ENGINE.say(message)
