@@ -20,7 +20,7 @@ import source.screens.tts_settings as tts_settings
 import source.constants as constants
 
 TOOLBAR_STRUCTURE = [
-    ['Session', ['Clear', 'Stop']],
+    ['Session', ['Clear Console', 'Update Rewards', 'Stop']],
     ["TTS", ["TTS Options", "Clear TTS Queue"]],
     ['Help', 'About']
 ]
@@ -34,8 +34,8 @@ class BaseCommunication(abc.ABC):
 
         self.raw_message_data = False
 
-        self._rewards = self._get_rewards()
-        self._commands = {i["command"]: i["name"] for i in self._rewards}
+        self._rewards = []
+        self._commands = {}
         self._running = True
         self._show_error = False
 
@@ -47,6 +47,19 @@ class BaseCommunication(abc.ABC):
             self.additional_settings = {}
 
         self._window = None
+        self._reward_buttons = []
+        self._layout = []
+
+        self.reload_rewards()
+
+        self.startup()
+
+        if start:
+            self.show_window()
+
+    def reload_rewards(self):
+        self._rewards = self._get_rewards()
+        self._commands = {i["command"]: i["name"] for i in self._rewards}
 
         self._reward_buttons = [
             [sg.Button(reward["name"], key="cmd_" + reward["command"])] for reward in self._rewards
@@ -67,11 +80,6 @@ class BaseCommunication(abc.ABC):
                 sg.Checkbox("Text to Speech", default=True, key="tts"), sg.Button("Clear TTS Queue")
             ]
         ]
-
-        self.startup()
-
-        if start:
-            self.show_window()
 
     def _tts_handler(self):
         try:
@@ -195,8 +203,15 @@ class BaseCommunication(abc.ABC):
             elif str(event).startswith("cmd_"):
                 self._dispatch_reward(event[4:], self._commands[event[4:]], "ManualTrigger")
 
-            elif event == "Clear":
+            elif event in ("Clear", "Clear Console"):
                 self._window["output"].update("")
+
+            elif event == "Update Rewards":
+                self._window.close()
+
+                self.reload_rewards()
+                self.startup()
+                self.show_window()
 
             elif event == "custom_command":
                 command = self._window["custom_command_text"].get()
