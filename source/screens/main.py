@@ -89,7 +89,7 @@ def show():
             window.close()
             try:
                 MODES[config["mode"]](config)
-            except exceptions.FailedToConnectException:
+            except (exceptions.FailedToConnectException, exceptions.ReturnToHomeException):
                 pass
             window = create_window()
 

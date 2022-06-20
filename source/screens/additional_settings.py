@@ -5,6 +5,7 @@ import PySimpleGUI as sg
 
 import source.defaults as defaults
 import source.setting as setting
+import source.exceptions as exceptions
 
 
 def show(name: str, settings: typing.List[setting.Setting]) -> dict:
@@ -52,7 +53,7 @@ def show(name: str, settings: typing.List[setting.Setting]) -> dict:
             *get_field(s)
         ] for s in settings
     ]
-    layout += [[sg.Button("Start")]]
+    layout += [[sg.Button("Start"), sg.Button("Home")]]
 
     window = sg.Window(layout=layout, **defaults.WINDOW_SETTINGS)
 
@@ -86,3 +87,7 @@ def show(name: str, settings: typing.List[setting.Setting]) -> dict:
                 defaults.set_defaults(name, response)
                 window.close()
                 return response
+
+        if event == "Home":
+            window.close()
+            raise exceptions.ReturnToHomeException("RTS")
