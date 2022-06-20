@@ -1,4 +1,4 @@
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 
 ABOUT_TEXT = """\
 Reverse Proxy v{version}
