@@ -43,7 +43,17 @@ def create_window():
     return sg.Window(layout=layout, **defaults.WINDOW_SETTINGS)
 
 
+def start_config(config: dict):
+    try:
+        MODES[config["mode"]](config)
+    except (exceptions.FailedToConnectException, exceptions.ReturnToHomeException):
+        pass
+
+
 def show():
+    if "--defaults" in sys.argv:
+        start_config(defaults.get_defaults())
+
     window = create_window()
 
     while True:
@@ -87,10 +97,7 @@ def show():
             defaults.set_defaults("main", config)
 
             window.close()
-            try:
-                MODES[config["mode"]](config)
-            except (exceptions.FailedToConnectException, exceptions.ReturnToHomeException):
-                pass
+            start_config(config)
             window = create_window()
 
     window.close()

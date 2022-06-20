@@ -11,6 +11,9 @@ import source.exceptions as exceptions
 def show(name: str, settings: typing.List[setting.Setting]) -> dict:
     try:
         default_values = defaults.get_defaults(name)
+        if "--defaults" in sys.argv:
+            return default_values
+
     except KeyError:
         default_values = {}
 
