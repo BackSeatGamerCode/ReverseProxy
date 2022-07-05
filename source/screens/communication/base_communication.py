@@ -91,7 +91,7 @@ class BaseCommunication(abc.ABC):
         tts.TTS_ENGINE.setProperty('volume', default_values.get('volume', tts.TTS_ENGINE.getProperty('volume')))
         tts.TTS_ENGINE.setProperty('voice', default_values.get('voice', tts.TTS_ENGINE.getProperty('voice')))
 
-        while True:
+        while self._running:
             message = self._tts_queue.get()
             tts.TTS_ENGINE.say(message)
             tts.TTS_ENGINE.runAndWait()
