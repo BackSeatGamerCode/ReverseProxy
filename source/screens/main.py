@@ -16,6 +16,7 @@ MODES = {
     "HTTP Broadcast": communication.HTTPBroadcast,
     "RCON Broadcast": communication.RCONBroadcast,
     "No Action": communication.NoAction,
+    "Key Press": communication.KeyPress,
 }
 
 FORMATS = [
