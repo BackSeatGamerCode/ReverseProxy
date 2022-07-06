@@ -21,7 +21,7 @@ class KeyPress(base_communication.BaseCommunication):
         self.raw_message_data = True
 
     def send_reward(self, message: str):
-        key = message["command"]
+        key = message["command"].lstrip("DIK_")
         try:
             keyboard.press_key(key)
             time.sleep(self.additional_settings["hold_duration"])
