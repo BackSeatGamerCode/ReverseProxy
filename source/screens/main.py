@@ -27,6 +27,8 @@ FORMATS = [
     "CSV"
 ]
 
+CHECKED_FOR_UPDATES = False
+
 
 def create_window():
     defs = defaults.get_defaults()
@@ -54,12 +56,17 @@ def start_config(config: dict):
 
 
 def show():
+    global CHECKED_FOR_UPDATES
+
     if "--defaults" in sys.argv:
+        CHECKED_FOR_UPDATES = True
         start_config(defaults.get_defaults())
 
     window = create_window()
 
-    if "--no-update" not in sys.argv:
+    if "--no-update" not in sys.argv and not CHECKED_FOR_UPDATES:
+        CHECKED_FOR_UPDATES = True
+
         new_version = update_checker.is_update_pending()
         if new_version is not False:
             update_notice.show(new_version)
