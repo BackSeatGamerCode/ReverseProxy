@@ -17,6 +17,9 @@ def is_update_pending() -> typing.Union[bool, dict]:
     if format_version_number(new_version) == format_version_number(constants.VERSION):
         return False
 
+    if release["draft"] or release["prerelease"]:
+        return False
+
     return release
 
 
