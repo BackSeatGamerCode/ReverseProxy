@@ -4,6 +4,8 @@ import PySimpleGUI as sg
 import source.defaults as defaults
 import source.screens.communication as communication
 import source.exceptions as exceptions
+import source.update_checker as update_checker
+import source.screens.update_notice as update_notice
 
 sg.change_look_and_feel('Dark2')
 
@@ -56,6 +58,11 @@ def show():
         start_config(defaults.get_defaults())
 
     window = create_window()
+
+    if "--no-update" not in sys.argv:
+        new_version = update_checker.is_update_pending()
+        if new_version is not False:
+            update_notice.show(new_version)
 
     while True:
         event, values = window.read()
