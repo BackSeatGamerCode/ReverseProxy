@@ -1,5 +1,4 @@
 import ctypes
-import time
 
 SendInput = ctypes.windll.user32.SendInput
 
