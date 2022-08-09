@@ -134,3 +134,4 @@ run.bat
 file_out/
 test_clients/
 errors/
+plugins/
