@@ -18,6 +18,7 @@ import source.sdk as sdk
 import source.setting as setting
 import source.screens.tts_settings as tts_settings
 import source.constants as constants
+import source.plugin_manager.plugin_manager as plugin_manager
 
 TOOLBAR_STRUCTURE = [
     ['Session', ['Clear Console', 'Update Rewards', 'Stop']],
@@ -42,6 +43,8 @@ class BaseCommunication(abc.ABC):
         self._tts_queue = queue.Queue()
         self._tts_thread = threading.Thread(target=self._tts_handler, name="TTSHandler", daemon=True)
         self._tts_thread.start()
+
+        self.plugin_manager = plugin_manager.PluginManager()
 
         if not hasattr(self, "additional_settings"):
             self.additional_settings = {}
