@@ -44,14 +44,14 @@ class BaseCommunication(abc.ABC):
         self._tts_thread = threading.Thread(target=self._tts_handler, name="TTSHandler", daemon=True)
         self._tts_thread.start()
 
-        self.plugin_manager = plugin_manager.PluginManager()
-
         if not hasattr(self, "additional_settings"):
             self.additional_settings = {}
 
         self._window = None
         self._reward_buttons = []
         self._layout = []
+
+        self.plugin_manager: plugin_manager.PluginManager = None
 
         self.reload_rewards()
 
@@ -192,12 +192,15 @@ class BaseCommunication(abc.ABC):
         self.send_reward(message)
 
     def write_to_console(self, message: str):
-        self._window["output"].update(message + "\n", append=True)
+        self._window["output"].update(str(message) + "\n", append=True)
 
     def show_window(self):
         self._window = sg.Window(layout=self._layout, **defaults.WINDOW_SETTINGS)
 
         threading.Thread(target=self._poll_server_daemon, daemon=True, name="BSG Reverse Proxy Poll").start()
+
+        self.plugin_manager = plugin_manager.PluginManager(self)
+        self.plugin_manager.reload_mods()
 
         while True:
             event, values = self._window.read()
@@ -209,8 +212,7 @@ class BaseCommunication(abc.ABC):
                 self._dispatch_reward(event[4:], self._commands[event[4:]], "ManualTrigger")
 
             elif event in ("Clear", "Clear Console"):
-                self._window["output"].update("")
-                self.plugin_manager.on_console_clear()
+                self.clear_console()
 
             elif event == "Update Rewards":
                 self._window.close()
@@ -227,25 +229,43 @@ class BaseCommunication(abc.ABC):
                 self._dispatch_reward(command, command, "ManualTrigger")
 
             elif event == "Stop":
-                self._running = False
-                self._window.close()
-
-                if self._show_error:
-                    self.alert_box("The provided access code is no longer valid. Check the spelling and try again.")
-
-                self.plugin_manager.on_close()
-                self.teardown()
+                self.disconnect()
                 return
 
             elif event == "About":
                 self.alert_box(constants.ABOUT_TEXT)
 
             elif event == "Clear TTS Queue":
-                while not self._tts_queue.empty():
-                    self._tts_queue.get()
+                self.clear_tts_queue()
 
             elif event == "TTS Options":
                 tts_settings.show()
+
+    def disconnect(self):
+        self._running = False
+
+        self.plugin_manager.on_close()
+
+        self._window.close()
+
+        if self._show_error:
+            self.alert_box("The provided access code is no longer valid. Check the spelling and try again.")
+
+        self.teardown()
+
+    def clear_console(self):
+        self._window["output"].update("")
+        self.plugin_manager.on_console_clear()
+
+    def clear_tts_queue(self):
+        while not self._tts_queue.empty():
+            self._tts_queue.get()
+
+    def set_tts_state(self, state: bool):
+        self._window["tts"].update(state)
+
+    def get_tts_state(self) -> bool:
+        return self._window["tts"].get()
 
     def alert_box(self, message: str, dialog_type: str = "Popup"):
         settings = defaults.WINDOW_SETTINGS.copy()

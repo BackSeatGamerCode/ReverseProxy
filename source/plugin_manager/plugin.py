@@ -35,14 +35,15 @@ class Info:
 
 
 class Plugin:
-    def __init__(self, path: str):
+    def __init__(self, builtin_funcs: dict, path: str):
+        self._builtin_funcs = builtin_funcs
         self._path = path
 
         archive = zipfile.ZipFile(self._path, 'r')
 
         self._info = Info.from_bytes(archive.read('info.json'))
         self._source = archive.read('main.py').decode("utf-8")
-        self._bytecode = {}
+        self._bytecode = self._builtin_funcs
 
         exec(self._source, self._bytecode)
 
