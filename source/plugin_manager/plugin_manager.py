@@ -72,7 +72,7 @@ class PluginManager:
         stacktrace = []
         break_length = 100
 
-        for line in traceback.format_exc().split("\n"):
+        for line in traceback.format_exc(chain=False).split("\n"):
             if line.lower().startswith(("traceback", '  file "<string>"', "  file '<string>'")):
                 stacktrace.append(line)
 

@@ -57,8 +57,12 @@ class Plugin:
         exec(self._source, self._bytecode)
 
     def pull_file(self, path: str) -> bytes:
-        with zipfile.ZipFile(self._path, 'r') as archive:
-            return archive.read(path)
+        try:
+            with zipfile.ZipFile(self._path, 'r') as archive:
+                return archive.read(path)
+
+        except KeyError:
+            raise FileNotFoundError("Requested file '{}' does not exist".format(path))
 
     def play_sound(self, path: str):
         extension_register = {
