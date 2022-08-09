@@ -164,6 +164,8 @@ class BaseCommunication(abc.ABC):
             guest=guest
         )
 
+        self.plugin_manager.on_command(command, name, guest)
+
         if self.raw_message_data:
             self.send_reward(data)
             return
@@ -208,11 +210,15 @@ class BaseCommunication(abc.ABC):
 
             elif event in ("Clear", "Clear Console"):
                 self._window["output"].update("")
+                self.plugin_manager.on_console_clear()
 
             elif event == "Update Rewards":
                 self._window.close()
 
                 self.reload_rewards()
+
+                self.plugin_manager.on_rewards_pull(self._rewards)
+
                 self.startup()
                 self.show_window()
 
@@ -227,6 +233,7 @@ class BaseCommunication(abc.ABC):
                 if self._show_error:
                     self.alert_box("The provided access code is no longer valid. Check the spelling and try again.")
 
+                self.plugin_manager.on_close()
                 self.teardown()
                 return
 

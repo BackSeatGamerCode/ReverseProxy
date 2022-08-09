@@ -47,3 +47,15 @@ class PluginManager:
 
     def on_start(self):
         self._execute_func("on_start")
+
+    def on_close(self):
+        self._execute_func("on_close")
+
+    def on_command(self, command, name, guest):
+        self._execute_func("on_command", command, name, guest)
+
+    def on_console_clear(self):
+        self._execute_func("on_console_clear")
+
+    def on_rewards_pull(self, rewards):
+        self._execute_func("on_rewards_pull", rewards)
