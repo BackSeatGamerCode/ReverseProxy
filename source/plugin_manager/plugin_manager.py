@@ -29,12 +29,18 @@ class PluginManager:
             "get_tts_state": self._parent.get_tts_state,
             "toggle_tts_state": lambda: self._parent.set_tts_state(not self._parent.get_tts_state),
             "clear_console": self._parent.clear_console,
-            "print": self._parent.write_to_console,
+            "print": self._print,
             "stop_session": self._parent.disconnect,
             "update_rewards": self._parent.reload_rewards
         }
 
         self._setup_directory()
+
+    def _print(self, *args, sep=' ', end='\n'):
+        message = "{}{}".format(sep.join(str(a) for a in args), end)
+        if message.endswith("\n"):
+            message = message[:-1]
+        self._parent.write_to_console(message)
 
     def _setup_directory(self):
         if not os.path.isdir(self._plugin_dir):
