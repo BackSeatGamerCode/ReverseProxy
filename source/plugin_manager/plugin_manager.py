@@ -50,9 +50,12 @@ class PluginManager:
 
             for mod in mod_index:
                 if mod["enabled"]:
-                    self._plugins.append(
-                        plugin_model.Plugin(self.builtin_funcs.copy(), os.path.join(self._plugin_dir, mod["name"]))
-                    )
+                    try:
+                        self._plugins.append(
+                            plugin_model.Plugin(self.builtin_funcs.copy(), os.path.join(self._plugin_dir, mod["name"]))
+                        )
+                    except Exception:
+                        self.show_plugin_syntax_error(mod["name"])
 
         self.on_start()
 
@@ -67,6 +70,15 @@ class PluginManager:
                 plugin.execute_func(func, *args, **kwargs)
             except Exception:
                 self.show_plugin_error(plugin)
+
+    def show_plugin_syntax_error(self, name: str):
+        break_length = 100
+
+        self._parent.write_to_console("-" * break_length)
+        self._parent.write_to_console("Plugin '{}' encountered the following exception:\n{}".format(
+            name, traceback.format_exc(limit=0).replace("<string>", "main.py").rstrip("\n")
+        ))
+        self._parent.write_to_console("-" * break_length)
 
     def show_plugin_error(self, plugin: plugin_model.Plugin):
         stacktrace = []
