@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import traceback
 import typing
 
@@ -59,28 +60,65 @@ class PluginManager:
                 mod_data["name"]
             )
             self._plugins.append(plugin)
+            plugin.execute_func("on_start")
+
             return plugin
 
         except Exception:
             self.show_plugin_syntax_error(mod_data["name"])
 
-    def reload_mods(self):
-        with open(self._control_file) as f:
-            mod_index = json.loads(f.read())
+    def reload_plugins(self):
+        for plugin in self._plugins:
+            plugin.execute_func("on_close")
 
-            for mod in mod_index:
-                if mod["enabled"]:
-                    self._load_plugin(mod)
+        self._plugins.clear()
+
+        with open(self._control_file) as f:
+            plugin_index = json.loads(f.read())
+
+            for plugin in plugin_index:
+                if plugin["enabled"]:
+                    self._load_plugin(plugin)
 
         self.on_start()
 
-        self.enable_plugin("dev_plugin")
-        self.disable_plugin("my_plugin.zip")
+        self.remove_plugin("my_plugin_new.zip", remove_files=True)
 
-    def get_mod(self, name: str) -> plugin_model.Plugin:
+    def get_plugin(self, name: str) -> plugin_model.Plugin:
         for plugin in self._plugins:
             if plugin.info.name == name:
                 return plugin
+
+    def install_plugin(self, path: str, enable: bool = True) -> plugin_model.Plugin:
+        ref_name = os.path.basename(path)
+
+        shutil.copy2(path, os.path.join(self._plugin_dir, ref_name))
+
+        mod_data = {"name": ref_name, "enabled": enable}
+
+        with open(self._control_file) as f:
+            plugin_index = json.loads(f.read())
+            plugin_index.append(mod_data)
+
+        with open(self._control_file, 'w') as f:
+            f.write(json.dumps(plugin_index))
+
+        if enable:
+            return self._load_plugin(mod_data)
+
+    def remove_plugin(self, ref_name: str, remove_files: bool = False):
+        with open(self._control_file) as f:
+            plugin_index = json.loads(f.read())
+
+            plugin_index = [p for p in plugin_index if p["name"] != ref_name]
+
+        with open(self._control_file, 'w') as f:
+            f.write(json.dumps(plugin_index))
+
+        if remove_files:
+            path = os.path.join(self._plugin_dir, ref_name)
+
+            os.remove(path)
 
     def _execute_func(self, func: str, *args, **kwargs):
         for plugin in self._plugins:
@@ -129,12 +167,10 @@ class PluginManager:
         for plugin in control:
             if plugin["name"] == name:
                 if plugin["enabled"] != state:
-                    print("State change")
 
                     if state:
                         p = self._load_plugin(plugin)
                         if p is not None:
-                            p.execute_func("on_start")
                             located_plugin = p
 
                     else:

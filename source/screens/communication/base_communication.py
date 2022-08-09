@@ -200,7 +200,7 @@ class BaseCommunication(abc.ABC):
         threading.Thread(target=self._poll_server_daemon, daemon=True, name="BSG Reverse Proxy Poll").start()
 
         self.plugin_manager = plugin_manager.PluginManager(self)
-        self.plugin_manager.reload_mods()
+        self.plugin_manager.reload_plugins()
 
         while True:
             event, values = self._window.read()
