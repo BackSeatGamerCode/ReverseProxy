@@ -40,6 +40,7 @@ class PluginManager:
         message = "{}{}".format(sep.join(str(a) for a in args), end)
         if message.endswith("\n"):
             message = message[:-1]
+
         self._parent.write_to_console(message)
 
     def _setup_directory(self):
@@ -50,20 +51,31 @@ class PluginManager:
             with open(self._control_file, 'w') as f:
                 f.write("{}")
 
+    def _load_plugin(self, mod_data) -> plugin_model.Plugin:
+        try:
+            plugin = plugin_model.Plugin(
+                self.builtin_funcs.copy(),
+                os.path.join(self._plugin_dir, mod_data["name"]),
+                mod_data["name"]
+            )
+            self._plugins.append(plugin)
+            return plugin
+
+        except Exception:
+            self.show_plugin_syntax_error(mod_data["name"])
+
     def reload_mods(self):
         with open(self._control_file) as f:
             mod_index = json.loads(f.read())
 
             for mod in mod_index:
                 if mod["enabled"]:
-                    try:
-                        self._plugins.append(
-                            plugin_model.Plugin(self.builtin_funcs.copy(), os.path.join(self._plugin_dir, mod["name"]))
-                        )
-                    except Exception:
-                        self.show_plugin_syntax_error(mod["name"])
+                    self._load_plugin(mod)
 
         self.on_start()
+
+        self.enable_plugin("dev_plugin")
+        self.disable_plugin("my_plugin.zip")
 
     def get_mod(self, name: str) -> plugin_model.Plugin:
         for plugin in self._plugins:
@@ -101,6 +113,46 @@ class PluginManager:
             plugin.info.name, "\n".join(stacktrace).replace("<string>", "main.py")
         ))
         self._parent.write_to_console("-" * break_length)
+
+    def enable_plugin(self, name: str) -> plugin_model.Plugin:
+        return self.set_plugin_state(name, True)
+
+    def disable_plugin(self, name: str) -> plugin_model.Plugin:
+        return self.set_plugin_state(name, False)
+
+    def set_plugin_state(self, name: str, state: bool) -> plugin_model.Plugin:
+        with open(self._control_file) as f:
+            control = json.loads(f.read())
+
+        located_plugin = None
+
+        for plugin in control:
+            if plugin["name"] == name:
+                if plugin["enabled"] != state:
+                    print("State change")
+
+                    if state:
+                        p = self._load_plugin(plugin)
+                        if p is not None:
+                            p.execute_func("on_start")
+                            located_plugin = p
+
+                    else:
+                        for p in self._plugins:
+                            if p.ref_name == plugin["name"]:
+                                located_plugin = p
+                                break
+
+                        if located_plugin is not None:
+                            located_plugin.execute_func("on_close")
+                            self._plugins.remove(located_plugin)
+
+                    plugin["enabled"] = state
+
+        with open(self._control_file, 'w') as f:
+            f.write(json.dumps(control))
+
+        return located_plugin
 
     def on_start(self):
         self._execute_func("on_start")

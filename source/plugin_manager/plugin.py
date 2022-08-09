@@ -42,7 +42,8 @@ class Info:
 
 
 class Plugin:
-    def __init__(self, builtin_funcs: dict, path: str):
+    def __init__(self, builtin_funcs: dict, path: str, ref_name: str):
+        self.ref_name = ref_name
         self._builtin_funcs = builtin_funcs
 
         self._is_directory = os.path.isdir(path)
