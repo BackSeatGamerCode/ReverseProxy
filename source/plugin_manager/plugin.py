@@ -21,12 +21,13 @@ class Info:
     desc: str
     url: str
     proxy_version: str
+    main: str
 
     @classmethod
     def from_dict(cls, data: dict):
         return cls(
             data.get("name"), data.get("version"), data.get("author"), data.get("desc"), data.get("url"),
-            data.get("proxy_version")
+            data.get("proxy_version"), data.get("main", "main.py")
         )
 
     @classmethod
@@ -48,7 +49,7 @@ class Plugin:
         self._path = path
 
         self._info = Info.from_bytes(self.pull_file('info.json'))
-        self._source = self.pull_file('main.py').decode("utf-8")
+        self._source = self.pull_file(self._info.main).decode("utf-8")
 
         self._builtin_funcs.update({
             "play_sound": self.play_sound,
