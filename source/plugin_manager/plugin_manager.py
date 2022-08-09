@@ -82,8 +82,6 @@ class PluginManager:
 
         self.on_start()
 
-        self.remove_plugin("my_plugin_new.zip", remove_files=True)
-
     def get_plugin(self, name: str) -> plugin_model.Plugin:
         for plugin in self._plugins:
             if plugin.info.name == name:
