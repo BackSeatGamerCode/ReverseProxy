@@ -23,6 +23,7 @@ import source.plugin_manager.plugin_manager as plugin_manager
 TOOLBAR_STRUCTURE = [
     ['Session', ['Clear Console', 'Update Rewards', 'Stop']],
     ["TTS", ["TTS Options", "Clear TTS Queue"]],
+    ["Plugins", ["Manage Plugins", "Reload All Plugins", "Plugin Guide"]],
     ['Help', 'About']
 ]
 
@@ -240,6 +241,15 @@ class BaseCommunication(abc.ABC):
 
             elif event == "TTS Options":
                 tts_settings.show()
+
+            elif event == "Manage Plugins":
+                print(event)
+
+            elif event == "Reload All Plugins":
+                print(event)
+
+            elif event == "Plugin Guide":
+                print(event)
 
     def disconnect(self):
         self._running = False
