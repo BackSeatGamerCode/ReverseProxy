@@ -1,8 +1,10 @@
-import zipfile
-import json
 import dataclasses
 import io
+import json
+import os.path
 import threading
+import zipfile
+
 import pydub
 import pydub.playback
 
@@ -41,6 +43,8 @@ class Info:
 class Plugin:
     def __init__(self, builtin_funcs: dict, path: str):
         self._builtin_funcs = builtin_funcs
+
+        self._is_directory = os.path.isdir(path)
         self._path = path
 
         self._info = Info.from_bytes(self.pull_file('info.json'))
@@ -49,19 +53,28 @@ class Plugin:
         self._builtin_funcs.update({
             "play_sound": self.play_sound,
             "info": self._info,
-            "read": self.pull_file
+            "read": self.pull_file,
+            "read_text": self.pull_text_file
         })
 
         self._bytecode = self._builtin_funcs
 
         exec(self._source, self._bytecode)
 
+    def pull_text_file(self, path: str, encoding: str = "utf-8") -> str:
+        return self.pull_file(path).decode(encoding)
+
     def pull_file(self, path: str) -> bytes:
         try:
-            with zipfile.ZipFile(self._path, 'r') as archive:
-                return archive.read(path)
+            if self._is_directory:
+                with open(os.path.join(self._path, path), 'rb') as f:
+                    return f.read()
 
-        except KeyError:
+            else:
+                with zipfile.ZipFile(self._path, 'r') as archive:
+                    return archive.read(path)
+
+        except (KeyError, FileNotFoundError):
             raise FileNotFoundError("Requested file '{}' does not exist".format(path))
 
     def play_sound(self, path: str):
