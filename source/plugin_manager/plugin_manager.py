@@ -1,5 +1,6 @@
 import json
 import os
+import traceback
 import typing
 
 import source.plugin_manager.plugin as plugin_model
@@ -62,7 +63,26 @@ class PluginManager:
 
     def _execute_func(self, func: str, *args, **kwargs):
         for plugin in self._plugins:
-            plugin.execute_func(func, *args, **kwargs)
+            try:
+                plugin.execute_func(func, *args, **kwargs)
+            except Exception:
+                self.show_plugin_error(plugin)
+
+    def show_plugin_error(self, plugin: plugin_model.Plugin):
+        stacktrace = []
+        break_length = 100
+
+        for line in traceback.format_exc().split("\n"):
+            if line.lower().startswith(("traceback", '  file "<string>"', "  file '<string>'")):
+                stacktrace.append(line)
+
+        stacktrace.append(traceback.format_exc().split("\n")[-2])
+
+        self._parent.write_to_console("-" * break_length)
+        self._parent.write_to_console("Plugin '{}' encountered the following exception:\n{}".format(
+            plugin.info.name, "\n".join(stacktrace).replace("<string>", "main.py")
+        ))
+        self._parent.write_to_console("-" * break_length)
 
     def on_start(self):
         self._execute_func("on_start")

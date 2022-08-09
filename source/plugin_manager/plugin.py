@@ -1,6 +1,10 @@
 import zipfile
 import json
 import dataclasses
+import io
+import threading
+import pydub
+import pydub.playback
 
 
 def default_func(*_, **__):
@@ -39,13 +43,48 @@ class Plugin:
         self._builtin_funcs = builtin_funcs
         self._path = path
 
-        archive = zipfile.ZipFile(self._path, 'r')
+        self._info = Info.from_bytes(self.pull_file('info.json'))
+        self._source = self.pull_file('main.py').decode("utf-8")
 
-        self._info = Info.from_bytes(archive.read('info.json'))
-        self._source = archive.read('main.py').decode("utf-8")
+        self._builtin_funcs.update({
+            "play_sound": self.play_sound,
+            "info": self._info,
+            "read": self.pull_file
+        })
+
         self._bytecode = self._builtin_funcs
 
         exec(self._source, self._bytecode)
+
+    def pull_file(self, path: str) -> bytes:
+        with zipfile.ZipFile(self._path, 'r') as archive:
+            return archive.read(path)
+
+    def play_sound(self, path: str):
+        extension_register = {
+            ".wavv": pydub.AudioSegment.from_wav,
+            ".flv": pydub.AudioSegment.from_flv,
+            ".ogg": pydub.AudioSegment.from_ogg,
+            ".mp3": pydub.AudioSegment.from_mp3,
+        }
+
+        buffer = io.BytesIO(self.pull_file(path))
+
+        for ext, handler in extension_register.items():
+            if path.lower().endswith(ext):
+                threading.Thread(
+                    target=pydub.playback.play,
+                    args=[handler(buffer)],
+                    daemon=True
+                ).start()
+                break
+
+        else:
+            raise ValueError(
+                "The requested file '{}' is not a supported audio file type. Supported file types:\n{}".format(
+                    path, ", ".join(extension_register.keys())
+                )
+            )
 
     def execute_func(self, func: str, *args, **kwargs):
         return self._bytecode.get(func, default_func)(*args, **kwargs)
