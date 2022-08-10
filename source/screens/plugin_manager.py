@@ -21,7 +21,10 @@ def create_window():
                 [sg.Button("Enable Selected")]
             ])
         ],
-        [sg.Button("Install Plugin"), sg.Button("Close")]
+        [
+            sg.Button("Install Plugin"),
+            sg.Button("Close")
+        ]
     ]
 
     return sg.Window(layout=layout, **defaults.WINDOW_SETTINGS)
@@ -55,6 +58,16 @@ def show(plugin_manager: 'plugin_manager_model.PluginManager'):
         elif event == "Enable Selected":
             for plugin in window["disabled_list"].get():
                 plugin_manager.enable_plugin(plugin)
+
+            reload_plugin_list()
+
+        elif event == "Install Plugin":
+            plugins = sg.popup_get_file(
+                "Locate your plugins", "Install Plugin", multiple_files=True, file_types=(("Plugin Files", "*.zip"),)
+            ).split(";")
+
+            for plugin in plugins:
+                plugin_manager.install_plugin(plugin, enable=True)
 
             reload_plugin_list()
 
