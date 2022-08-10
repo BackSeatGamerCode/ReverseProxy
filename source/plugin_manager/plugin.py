@@ -55,8 +55,10 @@ class Plugin:
         self._builtin_funcs.update({
             "play_sound": self.play_sound,
             "info": self._info,
-            "read": self.pull_file,
-            "read_text": self.pull_text_file
+            "read_raw": self.pull_file,
+            "read": self.pull_text_file,
+            "write": self.write_text_file,
+            "write_raw": self.write_file
         })
 
         self._bytecode = self._builtin_funcs
@@ -78,6 +80,18 @@ class Plugin:
 
         except (KeyError, FileNotFoundError):
             raise FileNotFoundError("Requested file '{}' does not exist".format(path))
+
+    def write_file(self, path: str, content: bytes):
+        if self._is_directory:
+            with open(os.path.join(self._path, path), 'wb') as f:
+                f.write(content)
+
+        else:
+            with zipfile.ZipFile(self._path, 'a') as archive:
+                archive.writestr(path, content)
+
+    def write_text_file(self, path: str, content: str, encoding: str = "utf-8"):
+        self.write_file(path, content.encode(encoding))
 
     def play_sound(self, path: str):
         extension_register = {
