@@ -1,10 +1,12 @@
 import json
 import os
 import shutil
+import threading
 import traceback
 import typing
 
 import source.plugin_manager.plugin as plugin_model
+import source.interface.keyboard as keyboard_if
 
 if typing.TYPE_CHECKING:
     import source.screens.communication.base_communication as base_communication
@@ -32,10 +34,16 @@ class PluginManager:
             "clear_console": self._parent.clear_console,
             "print": self._print,
             "stop_session": self._parent.disconnect,
-            "update_rewards": self._parent.reload_rewards
+            "update_rewards": self._parent.reload_rewards,
+            "keyboard": keyboard_if,
+            "background_task": self.background_task
         }
 
         self._setup_directory()
+
+    @staticmethod
+    def background_task(target: callable, *args, **kwargs):
+        threading.Thread(target=target, args=args, kwargs=kwargs, name="BSGReverseProxyBGTask", daemon=True).start()
 
     def get_plugin_count(self) -> int:
         return len(self._plugins)
