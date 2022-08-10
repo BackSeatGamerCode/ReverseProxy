@@ -20,6 +20,7 @@ import source.setting as setting
 import source.screens.tts_settings as tts_settings
 import source.constants as constants
 import source.plugin_manager.plugin_manager as plugin_manager
+import source.screens.plugin_manager as plugin_manager_screen
 
 TOOLBAR_STRUCTURE = [
     ['Session', ['Clear Console', 'Update Rewards', 'Stop']],
@@ -244,7 +245,7 @@ class BaseCommunication(abc.ABC):
                 tts_settings.show()
 
             elif event == "Manage Plugins":
-                print(event)
+                plugin_manager_screen.show(self.plugin_manager)
 
             elif event == "Reload All Plugins":
                 self.plugin_manager.reload_plugins()
