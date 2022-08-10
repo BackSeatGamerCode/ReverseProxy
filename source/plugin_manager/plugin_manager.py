@@ -83,8 +83,6 @@ class PluginManager:
                 if plugin["enabled"]:
                     self._load_plugin(plugin)
 
-        self.on_start()
-
     def get_plugin(self, name: str) -> plugin_model.Plugin:
         for plugin in self._plugins:
             if plugin.info.name == name:
