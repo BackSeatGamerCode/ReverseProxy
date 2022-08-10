@@ -2,8 +2,10 @@ import dataclasses
 import io
 import json
 import os.path
+import shutil
 import threading
 import zipfile
+import tempfile
 
 import pydub
 import pydub.playback
@@ -58,7 +60,8 @@ class Plugin:
             "read_raw": self.pull_file,
             "read": self.pull_text_file,
             "write": self.write_text_file,
-            "write_raw": self.write_file
+            "write_raw": self.write_file,
+            "remove_file": self.remove_file
         })
 
         self._bytecode = self._builtin_funcs
@@ -81,12 +84,41 @@ class Plugin:
         except (KeyError, FileNotFoundError):
             raise FileNotFoundError("Requested file '{}' does not exist".format(path))
 
+    def remove_file(self, path):
+        if self._is_directory:
+            file_path = os.path.join(self._path, path)
+
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+
+        else:
+            temp_dir = tempfile.mkdtemp()
+
+            try:
+                temp_name = os.path.join(temp_dir, 'new.zip')
+                with zipfile.ZipFile(self._path, 'r') as zipread:
+                    with zipfile.ZipFile(temp_name, 'w') as zipwrite:
+                        for item in zipread.infolist():
+                            if item.filename != path:
+                                data = zipread.read(item.filename)
+                                zipwrite.writestr(item, data)
+
+                shutil.move(temp_name, self._path)
+
+            finally:
+                shutil.rmtree(temp_dir)
+
     def write_file(self, path: str, content: bytes):
         if self._is_directory:
             with open(os.path.join(self._path, path), 'wb') as f:
                 f.write(content)
 
         else:
+            self.remove_file(path)
+
             with zipfile.ZipFile(self._path, 'a') as archive:
                 archive.writestr(path, content)
 
