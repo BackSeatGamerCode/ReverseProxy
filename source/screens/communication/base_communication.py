@@ -7,6 +7,7 @@ import sys
 import threading
 import time
 import typing
+import webbrowser
 
 import PySimpleGUI as sg
 import source.tts as tts
@@ -250,7 +251,7 @@ class BaseCommunication(abc.ABC):
                 self.write_to_console("Reloaded {} plugins".format(self.plugin_manager.get_plugin_count()))
 
             elif event == "Plugin Guide":
-                print(event)
+                webbrowser.open("https://github.com/BackSeatGamerCode/PluginGuide")
 
     def disconnect(self):
         self._running = False
