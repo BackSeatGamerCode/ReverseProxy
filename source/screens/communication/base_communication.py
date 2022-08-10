@@ -246,7 +246,8 @@ class BaseCommunication(abc.ABC):
                 print(event)
 
             elif event == "Reload All Plugins":
-                print(event)
+                self.plugin_manager.reload_plugins()
+                self.write_to_console("Reloaded {} plugins".format(self.plugin_manager.get_plugin_count()))
 
             elif event == "Plugin Guide":
                 print(event)

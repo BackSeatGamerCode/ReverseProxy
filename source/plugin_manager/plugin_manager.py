@@ -37,6 +37,9 @@ class PluginManager:
 
         self._setup_directory()
 
+    def get_plugin_count(self) -> int:
+        return len(self._plugins)
+
     def _print(self, *args, sep=' ', end='\n'):
         message = "{}{}".format(sep.join(str(a) for a in args), end)
         if message.endswith("\n"):
