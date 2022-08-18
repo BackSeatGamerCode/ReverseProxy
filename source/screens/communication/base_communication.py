@@ -2,6 +2,7 @@ import abc
 import csv
 import io
 import json
+import os.path
 import queue
 import sys
 import threading
@@ -21,11 +22,12 @@ import source.screens.tts_settings as tts_settings
 import source.constants as constants
 import source.plugin_manager.plugin_manager as plugin_manager
 import source.screens.plugin_manager as plugin_manager_screen
+import source.utils as utils
 
 TOOLBAR_STRUCTURE = [
     ['Session', ['Clear Console', 'Update Rewards', 'Stop']],
     ["TTS", ["TTS Options", "Clear TTS Queue"]],
-    ["Plugins", ["Manage Plugins", "Reload All Plugins", "Plugin Guide"]],
+    ["Plugins", ["Manage Plugins", "Reload All Plugins", "Package Plugin", "Browse Plugin Directory", "Plugin Guide"]],
     ['Help', 'About']
 ]
 
@@ -253,6 +255,19 @@ class BaseCommunication(abc.ABC):
 
             elif event == "Plugin Guide":
                 webbrowser.open("https://github.com/BackSeatGamerCode/PluginGuide")
+
+            elif event == "Package Plugin":
+                package_directory = sg.popup_get_folder(
+                    'Select folder', no_window=True, initial_folder=self.plugin_manager.get_plugin_dir()
+                )
+
+                save_dir = self.plugin_manager.package_plugin(package_directory)
+                self.alert_box(
+                    "Successfully packaged plugin as '{}'\n\nIt has NOT been installed.".format(save_dir)
+                )
+
+            elif event == "Browse Plugin Directory":
+                utils.open_in_explorer(os.path.abspath(plugin_manager.PLUGIN_DIR))
 
     def disconnect(self):
         self._running = False

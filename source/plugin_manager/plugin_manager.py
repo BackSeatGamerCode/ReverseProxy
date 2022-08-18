@@ -201,6 +201,18 @@ class PluginManager:
 
         return located_plugin
 
+    def get_plugin_dir(self) -> str:
+        return self._plugin_dir
+
+    def package_plugin(self, path: str) -> str:
+        if not os.path.isdir(path):
+            raise ValueError("Specified path '{}' is not a directory".format(path))
+
+        return shutil.make_archive(
+            os.path.join(self._plugin_dir, os.path.basename(path)),
+            'zip', path
+        )
+
     def on_start(self):
         self._execute_func("on_start")
 
