@@ -27,7 +27,10 @@ import source.utils as utils
 TOOLBAR_STRUCTURE = [
     ['Session', ['Clear Console', 'Update Rewards', 'Stop']],
     ["TTS", ["TTS Options", "Clear TTS Queue"]],
-    ["Plugins", ["Manage Plugins", "Reload All Plugins", "Package Plugin", "Browse Plugin Directory", "Plugin Guide"]],
+    ["Plugins", [
+        "Manage Plugins", "Reload All Plugins", "Package Plugin", "Browse Plugin Directory", "Plugin Guide",
+        "Create Template Plugin"
+    ]],
     ['Help', 'About']
 ]
 
@@ -255,6 +258,31 @@ class BaseCommunication(abc.ABC):
 
             elif event == "Plugin Guide":
                 webbrowser.open("https://github.com/BackSeatGamerCode/PluginGuide")
+
+            elif event == "Create Template Plugin":
+                settings = additional_settings_screen.show(
+                    "test name",
+                    [
+                        setting.Setting("Name", "name", default="MyPlugin"),
+                        setting.Setting("Version", "version", default="0.1.0"),
+                        setting.Setting("Author", "author", mandatory=False),
+                        setting.Setting("Description", "desc", mandatory=False),
+                        setting.Setting("URL", "url", mandatory=False),
+                    ],
+                    submit_text="Create", cancel_text="Cancel", save_defaults=False
+                )
+
+                plugin_name = "{}_{}".format(settings["name"], settings["version"])
+                plugin_path = self.plugin_manager.create_template_plugin(plugin_name, settings)
+
+                self.alert_box(
+                    "Template plugin '{}' has been created and saved at '{}'.\n\n"
+                    "It has also been installed and enabled.".format(
+                        plugin_name, plugin_path
+                    )
+                )
+
+                self.plugin_manager.install_plugin(plugin_path, enable=True, move=False)
 
             elif event == "Package Plugin":
                 package_directory = sg.popup_get_folder(

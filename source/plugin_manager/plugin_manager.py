@@ -7,6 +7,7 @@ import typing
 
 import source.plugin_manager.plugin as plugin_model
 import source.interface.keyboard as keyboard_if
+import source.strings as strings
 
 if typing.TYPE_CHECKING:
     import source.screens.communication.base_communication as base_communication
@@ -100,10 +101,11 @@ class PluginManager:
             if plugin.info.name == name:
                 return plugin
 
-    def install_plugin(self, path: str, enable: bool = True) -> plugin_model.Plugin:
+    def install_plugin(self, path: str, enable: bool = True, move: bool = True) -> plugin_model.Plugin:
         ref_name = os.path.basename(path)
 
-        shutil.copy2(path, os.path.join(self._plugin_dir, ref_name))
+        if move:
+            shutil.copy2(path, os.path.join(self._plugin_dir, ref_name))
 
         mod_data = {"name": ref_name, "enabled": enable}
 
@@ -212,6 +214,22 @@ class PluginManager:
             os.path.join(self._plugin_dir, os.path.basename(path)),
             'zip', path
         )
+
+    def create_template_plugin(self, name: str, info: dict) -> str:
+        plugin_path = os.path.join(self._plugin_dir, name)
+
+        try:
+            os.makedirs(plugin_path)
+        except FileExistsError:
+            pass
+
+        with open(os.path.join(plugin_path, "info.json"), 'w') as f:
+            f.write(json.dumps(info, indent=4))
+
+        with open(os.path.join(plugin_path, "main.py"), 'w') as f:
+            f.write(strings.DEFAULT_PLUGIN)
+
+        return plugin_path
 
     def on_start(self):
         self._execute_func("on_start")

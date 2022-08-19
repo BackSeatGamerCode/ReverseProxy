@@ -8,13 +8,20 @@ import source.setting as setting
 import source.exceptions as exceptions
 
 
-def show(name: str, settings: typing.List[setting.Setting]) -> dict:
-    try:
-        default_values = defaults.get_defaults(name)
-        if "--defaults" in sys.argv:
-            return default_values
+def show(
+        name: str, settings: typing.List[setting.Setting], submit_text: str = "Start", cancel_text: str = "Home",
+        save_defaults: bool = True
+) -> dict:
+    if save_defaults:
+        try:
+            default_values = defaults.get_defaults(name)
+            if "--defaults" in sys.argv:
+                return default_values
 
-    except KeyError:
+        except KeyError:
+            default_values = {}
+
+    else:
         default_values = {}
 
     def get_field(s: setting.Setting) -> list:
@@ -56,7 +63,7 @@ def show(name: str, settings: typing.List[setting.Setting]) -> dict:
             *get_field(s)
         ] for s in settings
     ]
-    layout += [[sg.Button("Start"), sg.Button("Home")]]
+    layout += [[sg.Button(submit_text), sg.Button(cancel_text)]]
 
     window = sg.Window(layout=layout, **defaults.WINDOW_SETTINGS)
 
@@ -66,7 +73,7 @@ def show(name: str, settings: typing.List[setting.Setting]) -> dict:
         if event == sg.WIN_CLOSED:
             sys.exit(0)
 
-        if event == "Start":
+        if event == submit_text:
             response = {}
             for s in settings:
                 value = window["K_" + s.key].get()
@@ -87,10 +94,12 @@ def show(name: str, settings: typing.List[setting.Setting]) -> dict:
                     break
 
             else:
-                defaults.set_defaults(name, response)
+                if save_defaults:
+                    defaults.set_defaults(name, response)
+
                 window.close()
                 return response
 
-        if event == "Home":
+        if event == cancel_text:
             window.close()
             raise exceptions.ReturnToHomeException("RTS")
