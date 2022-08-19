@@ -17,8 +17,9 @@ MODES = {
     "HTTP Listen": communication.HTTPListen,
     "HTTP Broadcast": communication.HTTPBroadcast,
     "RCON Broadcast": communication.RCONBroadcast,
-    "No Action": communication.NoAction,
     "Key Press": communication.KeyPress,
+    "No Action": communication.NoAction,
+    "Plugin Only": communication.NoAction,
 }
 
 FORMATS = [
