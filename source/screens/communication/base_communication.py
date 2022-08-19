@@ -272,6 +272,8 @@ class BaseCommunication(abc.ABC):
                     submit_text="Create", cancel_text="Cancel", save_defaults=False
                 )
 
+                settings["proxy_version"] = constants.VERSION
+
                 plugin_name = "{}_{}".format(settings["name"], settings["version"])
                 plugin_path = self.plugin_manager.create_template_plugin(plugin_name, settings)
 
