@@ -203,7 +203,7 @@ class BaseCommunication(abc.ABC):
         self._window["output"].update(str(message) + "\n", append=True)
 
     def show_window(self):
-        self._window = sg.Window(layout=self._layout, **defaults.WINDOW_SETTINGS)
+        self._window = sg.Window(layout=self._layout, **defaults.WINDOW_SETTINGS, return_keyboard_events=True)
 
         threading.Thread(target=self._poll_server_daemon, daemon=True, name="BSG Reverse Proxy Poll").start()
 
@@ -252,7 +252,7 @@ class BaseCommunication(abc.ABC):
             elif event == "Manage Plugins":
                 plugin_manager_screen.show(self.plugin_manager)
 
-            elif event == "Reload All Plugins":
+            elif event == "Reload All Plugins" or event == "r:82":
                 self.plugin_manager.reload_plugins()
                 self.write_to_console("Reloaded {} plugins".format(self.plugin_manager.get_plugin_count()))
 
