@@ -62,7 +62,7 @@ class PluginManager:
 
         if not os.path.isfile(self._control_file):
             with open(self._control_file, 'w') as f:
-                f.write("{}")
+                f.write("[]")
 
     def _load_plugin(self, mod_data) -> plugin_model.Plugin:
         try:
