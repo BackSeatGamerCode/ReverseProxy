@@ -19,7 +19,7 @@ MODES = {
     "RCON Broadcast": communication.RCONBroadcast,
     "Key Press": communication.KeyPress,
     "No Action": communication.NoAction,
-    "Plugin Only": communication.NoAction,
+    "Custom Plugin": communication.NoAction,
 }
 
 FORMATS = [
