@@ -105,7 +105,10 @@ class PluginManager:
         ref_name = os.path.basename(path)
 
         if move:
-            shutil.copy2(path, os.path.join(self._plugin_dir, ref_name))
+            try:
+                shutil.copy2(path, os.path.join(self._plugin_dir, ref_name))
+            except shutil.SameFileError:
+                pass
 
         mod_data = {"name": ref_name, "enabled": enable}
 
