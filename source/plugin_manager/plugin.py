@@ -128,8 +128,9 @@ class Plugin:
     def play_sound(self, path: str):
         extension_register = {
             ".wavv": pydub.AudioSegment.from_wav,
+            ".wav": pydub.AudioSegment.from_wav,
             ".flv": pydub.AudioSegment.from_flv,
-            ".ogg": pydub.AudioSegment.from_ogg,
+            # ".ogg": pydub.AudioSegment.from_ogg,
             ".mp3": pydub.AudioSegment.from_mp3,
         }
 
