@@ -15,7 +15,7 @@ class KeyPress(base_communication.BaseCommunication):
         return self.additional_settings["clear"]
 
     def startup(self):
-        self.get_additional_settings("file_write_settings", [
+        self.get_additional_settings("key_press_settings", [
             setting.Setting("Hold Duration", "hold_duration", cast=float, default="0.05"),
         ])
         self.raw_message_data = True

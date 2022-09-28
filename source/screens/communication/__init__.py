@@ -7,3 +7,4 @@ from source.screens.communication.http_broadcast import HTTPBroadcast
 from source.screens.communication.rcon_broadcast import RCONBroadcast
 from source.screens.communication.no_action import NoAction
 from source.screens.communication.key_press import KeyPress
+from source.screens.communication.game_command import GameCommand

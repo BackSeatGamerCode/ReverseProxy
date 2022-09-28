@@ -20,6 +20,7 @@ MODES = {
     "Key Press": communication.KeyPress,
     "No Action": communication.NoAction,
     "Custom Plugin": communication.NoAction,
+    "Game Command": communication.GameCommand,
 }
 
 FORMATS = [

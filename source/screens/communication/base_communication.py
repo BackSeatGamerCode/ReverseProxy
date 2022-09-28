@@ -23,6 +23,7 @@ import source.constants as constants
 import source.plugin_manager.plugin_manager as plugin_manager
 import source.screens.plugin_manager as plugin_manager_screen
 import source.utils as utils
+import source.enums.games as games
 
 TOOLBAR_STRUCTURE = [
     ['Session', ['Clear Console', 'Update Rewards', 'Stop']],
@@ -45,6 +46,8 @@ class BaseCommunication(abc.ABC):
 
         self._rewards = []
         self._commands = {}
+        self._session_data = {}
+        self._selected_game: games.GameList = games.GameList.UNKNOWN_GAME
         self._running = True
         self._show_error = False
 
@@ -69,8 +72,14 @@ class BaseCommunication(abc.ABC):
             self.show_window()
 
     def reload_rewards(self):
-        self._rewards = self._get_rewards()
+        self._rewards, self._session_data = self._get_rewards()
         self._commands = {i["command"]: i["name"] for i in self._rewards}
+
+        try:
+            self._selected_game = games.GameList(self._session_data["game"])
+
+        except ValueError:
+            self._selected_game = games.GameList.UNKNOWN_GAME
 
         self._reward_buttons = [
             [sg.Button(reward["name"], key="cmd_" + reward["command"])] for reward in self._rewards
@@ -146,7 +155,9 @@ class BaseCommunication(abc.ABC):
 
     def _get_rewards(self):
         try:
-            return sdk.get_rewards(self._config["server"], self._config["auth_code"])
+            data = sdk.get_rewards(self._config["server"], self._config["auth_code"])
+            return data["rewards"], data["session"]
+
         except KeyError:
             self.alert_box("The provided access code is no longer valid. Check the spelling and try again.")
             self.return_to_menu()
