@@ -52,6 +52,7 @@ VK_CODE = {
     "APOSTROPHE":      0x28,
     "'":               0x28,
     "GRAVE":           0x29,
+    "`":               0x29,
     "LSHIFT":          0x2A,
     "BACKSLASH":       0x2B,
     "\\":              0x2B,
