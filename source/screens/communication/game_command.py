@@ -15,6 +15,9 @@ class GameCommand(base_communication.BaseCommunication):
         if self._selected_game == enums.GameList.UNKNOWN_GAME:
             return
 
+        if self._selected_game == enums.GameList.SUBNAUTICA:
+            self.bump_key("RETURN")
+
         if self._selected_game == enums.GameList.PORTAL_2:
             self.bump_key("`")
 
@@ -25,8 +28,9 @@ class GameCommand(base_communication.BaseCommunication):
 
         time.sleep(DELAY)
 
+        self.bump_key("RETURN")
+
         if self._selected_game == enums.GameList.PORTAL_2:
-            self.bump_key("RETURN")
             self.bump_key("ESCAPE")
 
     def teardown(self):
