@@ -108,7 +108,7 @@ class BaseCommunication(abc.ABC):
                 sg.Button("Clear"), sg.Button("Stop"),
                 sg.Checkbox("Text to Speech", default=True, key="tts"),
                 sg.Button("Clear TTS Queue"),
-                sg.Checkbox("Pause Rewards", default=False, key="pause_rewards")
+                sg.Checkbox("Ignore Rewards", default=False, key="pause_rewards")
             ]
         ]
 
@@ -181,6 +181,9 @@ class BaseCommunication(abc.ABC):
             raise exceptions.FailedToConnectException()
 
     def _dispatch_reward(self, command: str, name: str, guest: str):
+        if self.get_pause_reward_queue():
+            return
+
         self.write_to_console("{} ({}) from: {}".format(name, command, guest))
 
         if self._window["tts"].get():

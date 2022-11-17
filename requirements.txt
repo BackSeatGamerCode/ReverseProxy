@@ -4,3 +4,4 @@ Flask~=1.1.4
 construct~=2.10.68
 pyttsx3~=2.90
 pydub~=0.25.1
+pynput~=1.7.2
