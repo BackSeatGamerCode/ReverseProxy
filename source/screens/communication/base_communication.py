@@ -11,6 +11,8 @@ import typing
 import webbrowser
 
 import PySimpleGUI as sg
+import pynput.keyboard
+
 import source.tts as tts
 
 import source.defaults as defaults
@@ -24,6 +26,7 @@ import source.plugin_manager.plugin_manager as plugin_manager
 import source.screens.plugin_manager as plugin_manager_screen
 import source.utils as utils
 import source.enums.games as games
+import source.hotkey_listener as hotkey_listener
 
 TOOLBAR_STRUCTURE = [
     ['Session', ['Clear Console', 'Update Rewards', 'Stop']],
@@ -50,6 +53,12 @@ class BaseCommunication(abc.ABC):
         self._selected_game: games.GameList = games.GameList.UNKNOWN_GAME
         self._running = True
         self._show_error = False
+        self._hotkey_listener = hotkey_listener.HotkeyListener()
+        self._hotkey_listener.add_key_combo(
+            "pause_queue", [pynput.keyboard.Key.ctrl_l, pynput.keyboard.Key.alt_l, pynput.keyboard.Key.shift, 's'],
+            event=self.toggle_reward_queue
+        )
+        self._hotkey_listener.start()
 
         self._tts_queue = queue.Queue()
         self._tts_thread = threading.Thread(target=self._tts_handler, name="TTSHandler", daemon=True)
@@ -97,7 +106,9 @@ class BaseCommunication(abc.ABC):
             ],
             [
                 sg.Button("Clear"), sg.Button("Stop"),
-                sg.Checkbox("Text to Speech", default=True, key="tts"), sg.Button("Clear TTS Queue")
+                sg.Checkbox("Text to Speech", default=True, key="tts"),
+                sg.Button("Clear TTS Queue"),
+                sg.Checkbox("Pause Rewards", default=False, key="pause_rewards")
             ]
         ]
 
@@ -310,6 +321,9 @@ class BaseCommunication(abc.ABC):
             elif event == "Browse Plugin Directory":
                 utils.open_in_explorer(os.path.abspath(plugin_manager.PLUGIN_DIR))
 
+            elif event == "S:82":
+                self.toggle_reward_queue()
+
     def disconnect(self):
         self._running = False
 
@@ -335,6 +349,21 @@ class BaseCommunication(abc.ABC):
 
     def get_tts_state(self) -> bool:
         return self._window["tts"].get()
+
+    def get_pause_reward_queue(self) -> bool:
+        return self._window["pause_rewards"].get()
+
+    def set_pause_reward_queue(self, state: bool):
+        self._window["pause_rewards"].update(state)
+
+    def toggle_reward_queue(self):
+        self.set_pause_reward_queue(not self.get_pause_reward_queue())
+
+    def pause_reward_queue(self):
+        self.set_pause_reward_queue(True)
+
+    def unpause_reward_queue(self):
+        self.set_pause_reward_queue(False)
 
     def alert_box(self, message: str, dialog_type: str = "Popup"):
         settings = defaults.WINDOW_SETTINGS.copy()
