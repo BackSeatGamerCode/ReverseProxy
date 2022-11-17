@@ -21,6 +21,9 @@ class GameCommand(base_communication.BaseCommunication):
         if self._selected_game == enums.GameList.PORTAL_2:
             self.bump_key("`")
 
+        if self._selected_game == enums.GameList.THE_SIMS_4:
+            self.key_combination("LCONTROL", "LSHIFT", 'C')
+
         time.sleep(DELAY)
 
         for char in message["command"]:
@@ -32,6 +35,9 @@ class GameCommand(base_communication.BaseCommunication):
 
         if self._selected_game == enums.GameList.PORTAL_2:
             self.bump_key("ESCAPE")
+
+        if self._selected_game == enums.GameList.THE_SIMS_4:
+            self.key_combination("LCONTROL", "LSHIFT", 'C')
 
     def teardown(self):
         pass
@@ -48,3 +54,21 @@ class GameCommand(base_communication.BaseCommunication):
         else:
             keyboard_press.press_key(key)
             keyboard_press.release_key(key)
+
+    @staticmethod
+    def key_combination(*keys):
+        for key in keys:
+            if key in ("UNDERLINE", "_"):
+                keyboard_press.press_key("LSHIFT")
+                keyboard_press.press_key("MINUS")
+
+            else:
+                keyboard_press.press_key(key)
+
+        for key in keys:
+            if key in ("UNDERLINE", "_"):
+                keyboard_press.release_key("MINUS")
+                keyboard_press.release_key("LSHIFT")
+
+            else:
+                keyboard_press.release_key(key)
